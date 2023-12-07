@@ -153,8 +153,11 @@ Below is a list of data in the *people* table.
 #| echo: false
 #| eval: true
 #| 
-sql = "SELECT * FROM people;"
-## Add code to list people table here
+
+sql = f"""
+select * from people;
+"""
+
 try:
     df = pd.read_sql(sql,cnx)
     df
@@ -179,7 +182,7 @@ Below is a list of data in the *skills* table.
 #| eval: true
 
 sql = f"""
-select * from people;
+select * from skills;
 """
 
 try:
@@ -205,7 +208,18 @@ Below is a list of data in the *roles* table.
 #| echo: false
 #| eval: true
 
-## Add code to list roles table here
+sql = f"""
+select * from roles;
+"""
+
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
 ```
 
 
@@ -276,11 +290,10 @@ from
     peopleskills a
     inner join people b on (a.people_id = b.id)
     inner join skills c on (a.skills_id = c.id)
-WHERE
+where
     people_last_name = 'Person 1'
 order BY
-    name,
-    people_last_name
+    tag
 ;
 """
 try:
@@ -305,7 +318,7 @@ from
     peopleskills a
     inner join skills c on (a.skills_id = c.id)
     inner join people b on (a.people_id = b.id)
-WHERE
+where
     tag = 'Skill 6'
 order BY
     people_last_name
@@ -326,14 +339,14 @@ df
 ```{python}
 sql = f"""
 SELECT
+    name,
     people_first_name,
-    people_last_name,
-    name
+    people_last_name
 from
     peopleroles a
     inner join roles c on (a.role_id = c.id)
     inner join people b on (a.people_id = b.id)
-WHERE
+where
     name = 'Developer'
 order BY
     people_last_name
@@ -353,19 +366,15 @@ df
 ### List names and email addresses of people without skills
 ```{python}
 sql = f"""
-SELECT
-    people_first_name,
-    people_last_name,
-    name
-from
-    peopleroles a
-    inner join roles c on (a.role_id = c.id)
-    inner join people b on (a.people_id = b.id)
-WHERE
-    name = 'Developer'
-order BY
-    people_last_name
-;
+SELECT 
+    people_first_name, 
+    people_last_name, 
+    people_email
+from 
+    people a
+    left join peopleskills b on (a.id = b.people_id)
+where 
+    b.id IS NULL;
 """
 try:
     df = pd.read_sql(sql,cnx)
@@ -387,7 +396,7 @@ SELECT
 from 
     skills a
     left join peopleskills b on (a.id = b.skills_id)
-WHERE 
+where 
     b.id IS NULL;
 """
 try:
@@ -401,10 +410,38 @@ df
 ```
 
 
-### List people names and skill names with the BOSS role DO THIS
+### List people names and skill names with the BOSS role 
+```{python}
+sql = f"""
+SELECT
+    c.name,
+    b.people_first_name,
+    b.people_last_name,
+    e.name
+from
+    peopleroles a
+    inner join people b on (a.people_id = b.id)
+    inner join roles c on (a.role_id = c.id)
+    inner join peopleskills d on (a.people_id = d.people_id)
+    inner join skills e on (d.skills_id = e.id)
+where
+    c.name = 'Boss'
+order BY
+    people_last_name
+;
+"""
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+```
 
 
-### List ids and names of unused roles FIX THIS
+### List ids and names of unused roles 
 ```{python}
 sql = f"""
 SELECT 
@@ -413,7 +450,7 @@ SELECT
 from 
     roles a
     left join peopleroles b on (a.id = b.role_id)
-WHERE 
+where 
     b.role_id IS NULL;
 """
 try:
@@ -428,5 +465,4 @@ df
 
 ## Reflection
 
-(Write a paragraph expressing your thoughts, feelings, and insights about your experience with this assignment.  Pause and breath before writing - I'm trying to encourage critical thinking and self-awareness while allowing you to explore the connections between theory and practice. And yes, delete this paragraph.)
-
+Honestly this assignment was a pretty satifying level of difficulty. There were some obstacles but, generally, after trying a few things and thinking about it they were overcome-able. Writing the queries went more smoothly than I had expected which maybe means I am getting a little better at that. I did run into some issues with the qmd file saying my tables did not exist when they did exist but after asking the professor this was figured out. That issue was the only thing that really made me feel like I was hitting my head against a wall. 
