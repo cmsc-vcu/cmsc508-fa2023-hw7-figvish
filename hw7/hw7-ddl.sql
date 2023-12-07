@@ -1,4 +1,4 @@
-# hw7-ddl.sql
+# hw7-ddl.sql - Fig Vishton
 
 ## DO NOT RENAME OR OTHERWISE CHANGE THE SECTION TITLES OR ORDER.
 ## The autograder will look for specific code sections. If it can't find them, you'll get a "0"
